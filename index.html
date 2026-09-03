@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Runway</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Runway">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230071e3'/%3E%3Cpath d='M18 40 L32 20 L46 40' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230071e3'/%3E%3Cpath d='M18 40 L32 20 L46 40' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#ffffff; --bg2:#f5f5f7; --bg3:#e8e8ed; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#a1a1a6;
+  --line:rgba(0,0,0,.08); --accent:#0071e3; --accent-ink:#fff;
+  --hi:#ff3b30; --mid:#ff9500; --lo:#34c759; --event:#8e8e93;
+  --r:18px; --rs:12px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Helvetica,Inter,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#000; --bg2:#1c1c1e; --bg3:#2c2c2e; --ink:#f5f5f7; --ink2:#a1a1a6; --ink3:#6e6e73; --line:rgba(255,255,255,.1); }
+}
+:root[data-theme="dark"]{ --bg:#000; --bg2:#1c1c1e; --bg3:#2c2c2e; --ink:#f5f5f7; --ink2:#a1a1a6; --ink3:#6e6e73; --line:rgba(255,255,255,.1); }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:17px;line-height:1.35;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+a{color:var(--accent)}
+.screen{display:none;max-width:680px;margin:0 auto;padding:calc(20px + var(--safe-t)) 20px calc(172px + var(--safe-b))}
+.screen.on{display:block}
+h1{font-size:34px;font-weight:700;letter-spacing:-.022em;line-height:1.1}
+h2{font-size:22px;font-weight:600;letter-spacing:-.015em;margin:34px 0 12px}
+h2 small{font-weight:400;color:var(--ink2);font-size:15px;margin-left:8px;letter-spacing:0}
+.sub{color:var(--ink2);font-size:17px;margin-top:4px}
+.card{background:var(--bg2);border-radius:var(--r);padding:18px}
+.row{display:flex;align-items:center;gap:12px}
+.grow{flex:1;min-width:0}
+.muted{color:var(--ink2)}.tiny{font-size:13px}.small{font-size:15px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:980px;padding:12px 22px;font-weight:600;font-size:17px;background:var(--accent);color:var(--accent-ink);transition:transform .12s,opacity .12s}
+.btn:active{transform:scale(.97)}.btn:disabled{opacity:.4;cursor:default}
+.btn.sec{background:var(--bg3);color:var(--ink)}
+.btn.ghost{background:none;color:var(--accent);padding:8px 4px}
+.btn.wide{width:100%}
+.btn.sm{padding:8px 14px;font-size:15px}
+.btn.danger{color:var(--hi);background:none}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:980px;padding:6px 12px;font-size:14px;font-weight:500;background:var(--bg3)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.p3 .dot,.dot.p3{background:var(--hi)}.p2 .dot,.dot.p2{background:var(--mid)}.p1 .dot,.dot.p1{background:var(--lo)}
+.list{background:var(--bg2);border-radius:var(--r);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid var(--line);min-height:56px}
+.item:first-child{border-top:0}
+.item .t{font-weight:500}.item .m{color:var(--ink2);font-size:13px;margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+.item.done .t{text-decoration:line-through;color:var(--ink3)}
+.chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink3);flex:none;display:grid;place-items:center;transition:all .15s}
+.chk.on{background:var(--accent);border-color:var(--accent)}
+.chk svg{opacity:0;width:14px;height:14px;stroke:#fff;stroke-width:3;fill:none;transition:opacity .15s}
+.chk.on svg{opacity:1}
+.x{color:var(--ink3);padding:6px;border-radius:50%;flex:none}
+.x:hover{color:var(--hi)}
+.empty{padding:28px 16px;text-align:center;color:var(--ink2);font-size:15px}
+/* tab bar */
+nav{position:fixed;left:0;right:0;bottom:0;padding:8px 8px calc(10px + var(--safe-b));backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-top:1px solid var(--line);z-index:50}
+nav .in{max-width:680px;margin:0 auto;display:flex}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--ink3);font-size:11px;font-weight:500;border-radius:12px}
+nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--accent)}
+/* segmented */
+.seg{display:flex;background:var(--bg3);border-radius:12px;padding:3px;gap:2px}
+.seg button{flex:1;padding:8px 6px;border-radius:9px;font-size:14px;font-weight:500;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg button.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+/* reality */
+.reality{background:var(--ink);color:var(--bg);border-radius:var(--r);padding:22px 20px}
+.reality .big{font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.reality .lbl{opacity:.6;font-size:14px;margin-top:2px}
+.stepper{display:flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--bg) 14%,transparent);border-radius:980px;padding:4px}
+.stepper button{width:40px;height:40px;border-radius:50%;font-size:22px;color:inherit;display:grid;place-items:center}
+.stepper button:active{background:color-mix(in srgb,var(--bg) 20%,transparent)}
+.cap{height:8px;border-radius:4px;background:color-mix(in srgb,var(--bg) 16%,transparent);overflow:hidden;margin-top:18px;position:relative}
+.cap i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--bg);opacity:.9}
+.cap b{position:absolute;left:0;top:0;bottom:0;background:var(--hi);opacity:.85;border-radius:4px}
+.reality .verdict{margin-top:12px;font-size:15px;opacity:.85;line-height:1.4}
+/* timeline */
+.tl{position:relative;padding-left:64px}
+.tl .blk{position:relative;margin-bottom:10px;border-radius:14px;padding:12px 14px;background:var(--bg2)}
+.tl .blk.task{background:color-mix(in srgb,var(--accent) 12%,var(--bg2));border-left:4px solid var(--accent)}
+.tl .blk.ev{border-left:4px solid var(--event);color:var(--ink2)}
+.tl .blk.brk{background:none;color:var(--ink3);font-size:13px;padding:4px 14px;margin-bottom:6px}
+.tl .blk .tm{position:absolute;left:-64px;top:12px;width:54px;text-align:right;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.tl .blk.brk .tm{top:4px}
+.tl .blk.now{outline:2px solid var(--accent)}
+/* week */
+.week{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;margin:0 -20px;padding-left:20px;padding-right:20px;scrollbar-width:none}
+.week::-webkit-scrollbar{display:none}
+.day{flex:0 0 78%;scroll-snap-align:start;background:var(--bg2);border-radius:var(--r);padding:16px;min-height:200px}
+@media(min-width:700px){.week{display:grid;grid-template-columns:repeat(7,1fr);overflow:visible;margin:0;padding:0}.day{flex:none;padding:12px}}
+.day.today{outline:2px solid var(--accent)}
+.day h3{font-size:15px;font-weight:600}
+.day h3 span{display:block;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-top:2px}
+.day .ev{font-size:13px;color:var(--ink2);margin-top:10px;padding-left:8px;border-left:2px solid var(--event)}
+.day .tk{font-size:14px;margin-top:10px;display:flex;gap:8px;align-items:flex-start;font-weight:500}
+.day .tk .dot{margin-top:6px}
+.day .tk.done{text-decoration:line-through;color:var(--ink3);font-weight:400}
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px;margin-top:16px}
+.field label{font-size:13px;color:var(--ink2);font-weight:500}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{width:100%;background:var(--bg2);border:0;border-radius:var(--rs);padding:12px 14px;font-size:17px;outline:none;-webkit-appearance:none;appearance:none}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+textarea{min-height:90px;resize:vertical}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{border-radius:980px;padding:8px 14px;background:var(--bg2);font-size:15px;font-weight:500;display:inline-flex;gap:8px;align-items:center;border:1.5px solid transparent}
+.chip.on{background:var(--accent);color:var(--accent-ink)}
+.chip.add{border:1.5px dashed var(--ink3);background:none;color:var(--ink2)}
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.on{display:flex}
+.sheet{width:100%;max-width:680px;max-height:92vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:14px 20px calc(24px + var(--safe-b));animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:700px){.sheet-bg{align-items:center}.sheet{border-radius:22px;max-height:85vh}}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--bg3);margin:0 auto 14px}
+.sheet h2{margin:6px 0 4px}
+.fab{position:fixed;right:20px;bottom:calc(88px + var(--safe-b));width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:45}
+/* today layout: single column by default (mobile), two columns on wide screens */
+.today-grid{display:block}
+.today-right:empty{display:none}
+@media(min-width:900px){
+  #s-today{max-width:1080px}
+  .today-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+  .today-right{position:sticky;top:20px}
+}
+/* now playing */
+.now-playing{display:flex;align-items:center;gap:12px;background:var(--bg2);border-radius:var(--r);padding:10px;margin-top:18px}
+.now-playing img{width:46px;height:46px;border-radius:9px;flex:none;object-fit:cover}
+.now-playing .np-t{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.now-playing .np-a{color:var(--ink2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.now-playing .np-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
+.now-playing .np-bar i{display:block;height:100%;background:#1DB954;border-radius:2px}
+.now-playing button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--ink)}
+.now-playing button:active{background:var(--bg3)}
+.now-playing svg{width:18px;height:18px;fill:currentColor}
+.fab svg{width:26px;height:26px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+@media(min-width:700px){.fab{right:32px}}
+.toast{position:fixed;left:32px;bottom:calc(96px + var(--safe-b));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:980px;font-size:14px;font-weight:500;z-index:100;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 100px);overflow:hidden;text-overflow:ellipsis}
+@media(max-width:699px){.toast{left:50%;transform:translateX(-50%);bottom:calc(160px + var(--safe-b))}}
+.toast.on{opacity:1}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:1px solid var(--line)}
+.setting:first-child{border-top:0}
+.setting input,.setting select{width:auto;max-width:150px;padding:8px 12px;text-align:right}
+.setting input[type=color]{width:44px;height:32px;padding:0;border:0;background:none;border-radius:8px}
+.status{font-size:13px;color:var(--ink2)}
+.status.ok{color:var(--lo)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.overdue{color:var(--hi)}
+.note{white-space:pre-wrap;font-size:14px;color:var(--ink2);background:var(--bg);border-radius:10px;padding:10px 12px;margin-top:8px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- TODAY -->
+<section class="screen on" id="s-today">
+  <div class="head">
+    <div><div class="sub" id="today-greet">Today</div><h1 id="today-date"></h1></div>
+    <button class="btn ghost sm" onclick="syncCalendar()" id="sync-btn" title="Refresh Google Calendar">Sync</button>
+  </div>
+
+  <div id="now-playing"></div>
+
+  <div class="today-grid">
+    <div class="today-left">
+      <div id="headsup"></div>
+
+      <h2>Reality check</h2>
+      <div class="reality">
+        <div class="row">
+          <div class="grow"><div class="big" id="budget-txt">3h</div><div class="lbl">of task time today</div></div>
+          <div class="stepper"><button onclick="bumpBudget(-30)" aria-label="Less time">−</button><button onclick="bumpBudget(30)" aria-label="More time">+</button></div>
+        </div>
+        <div class="cap"><b id="cap-need"></b><i id="cap-have"></i></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="row" style="margin-top:18px;gap:10px">
+          <button class="btn grow" style="background:var(--bg);color:var(--ink)" onclick="planToday()">Plan my day</button>
+          <button class="btn sm" style="background:color-mix(in srgb,var(--bg) 14%,transparent);color:inherit" onclick="pushPlan()" id="push-btn">Send to Calendar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="today-right" id="plan-wrap"></div>
+  </div>
+</section>
+
+<!-- WEEK -->
+<section class="screen" id="s-week">
+  <div class="head"><div><div class="sub">Next 7 days</div><h1>Week</h1></div></div>
+  <div id="overdue-wrap"></div>
+  <h2>At a glance</h2>
+  <div class="week" id="week"></div>
+  <h2>Realistic timeline <small>at your daily budget</small></h2>
+  <div class="card" id="projection"></div>
+</section>
+
+<!-- TASKS -->
+<section class="screen" id="s-tasks">
+  <div class="head"><div><div class="sub" id="task-count"></div><h1>Tasks</h1></div></div>
+  <div class="seg" id="cat-seg" style="margin-top:18px"></div>
+  <div id="classes-wrap"></div>
+  <div id="task-lists"></div>
+  <div style="margin-top:24px" class="row"><button class="btn ghost sm" onclick="toggleDone()" id="show-done">Show completed</button></div>
+</section>
+
+<!-- SETTINGS -->
+<section class="screen" id="s-settings">
+  <div class="head"><div><div class="sub">Make it yours</div><h1>Settings</h1></div></div>
+
+  <h2>Planning</h2>
+  <div class="list">
+    <div class="setting"><span>Default task time (min)</span><input type="number" id="st-budget" min="15" step="15" onchange="setS('budget',+this.value)"> </div>
+    <div class="setting"><span>Day starts</span><input type="time" id="st-start" onchange="setS('dayStart',this.value)"></div>
+    <div class="setting"><span>Day ends</span><input type="time" id="st-end" onchange="setS('dayEnd',this.value)"></div>
+    <div class="setting"><span>Focus block length</span><select id="st-chunk" onchange="setS('chunk',+this.value)"><option value="25">25 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="90">90 min</option><option value="9999">Don't split</option></select></div>
+    <div class="setting"><span>Break between blocks</span><select id="st-break" onchange="setS('breakMin',+this.value)"><option value="0">None</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></div>
+    <div class="setting"><span>Heads-up window</span><select id="st-heads" onchange="setS('headsUpDays',+this.value)"><option value="2">2 days</option><option value="3">3 days</option><option value="5">5 days</option><option value="7">7 days</option></select></div>
+  </div>
+
+  <h2>Look</h2>
+  <div class="list">
+    <div class="setting"><span>App name</span><input type="text" id="st-name" onchange="setS('appName',this.value)"></div>
+    <div class="setting"><span>Accent</span><input type="color" id="st-accent" onchange="setS('accent',this.value)"></div>
+    <div class="setting"><span>Theme</span><select id="st-theme" onchange="setS('theme',this.value)"><option value="auto">Match phone</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+  </div>
+
+  <h2>Categories</h2>
+  <div class="list" id="cat-list"></div>
+  <div class="row" style="margin-top:10px"><button class="btn ghost sm" onclick="addCategory()">Add category</button></div>
+
+  <h2>Google Calendar</h2>
+  <div class="list">
+    <div class="setting" style="flex-direction:column;align-items:stretch"><span>OAuth client ID</span><input type="text" id="st-client" placeholder="xxxxx.apps.googleusercontent.com" style="max-width:none;text-align:left;margin-top:6px" onchange="setS('clientId',this.value.trim())"></div>
+    <div class="setting"><span>Plan calendar name</span><input type="text" id="st-plancal" onchange="setS('planCalName',this.value)"></div>
+    <div class="setting"><div><div>Connection</div><div class="status" id="g-status">Not connected</div></div><button class="btn sm sec" id="g-btn" onclick="gConnect()">Connect</button></div>
+    <div class="setting"><span>Sync across devices</span><span class="status" id="drive-status">—</span></div>
+  </div>
+  <p class="muted tiny" style="margin-top:10px;line-height:1.5">One-time setup: in Google Cloud Console create a project → enable the Google Calendar API and the Google Drive API → create an OAuth client (Web application) → add this site's URL as an authorized JavaScript origin → paste the client ID above. Your tasks sync between your devices through a hidden file in your own Google Drive — nothing is readable by anyone but you, and Runway can't see the rest of your Drive.</p>
+
+  <h2>Now Playing <small>Spotify</small></h2>
+  <div class="list">
+    <div class="setting" style="flex-direction:column;align-items:stretch"><span>Spotify client ID</span><input type="text" id="st-sp-client" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="max-width:none;text-align:left;margin-top:6px" onchange="setSpotifyClientId(this.value.trim())"></div>
+    <div class="setting"><div><div>Connection</div><div class="status" id="sp-status">Not connected</div></div><button class="btn sm sec" id="sp-btn" onclick="spConnect()">Connect</button></div>
+  </div>
+  <p class="muted tiny" style="margin-top:10px;line-height:1.5">One-time setup: at developer.spotify.com/dashboard create an app → Redirect URI must exactly match this site's URL (e.g. https://askh3.github.io/runway/) → paste the Client ID above. No secret needed. Track info shows on the Today screen; play/pause/skip need Spotify open somewhere as the active device. YouTube Music has no public API to connect to safely, so it isn't supported.</p>
+
+  <h2>Data</h2>
+  <div class="list">
+    <div class="setting"><span>Stored on this device</span><span class="status" id="data-size"></span></div>
+    <div class="setting"><span>Backup</span><button class="btn sm sec" onclick="exportData()">Export JSON</button></div>
+    <div class="setting"><span>Restore</span><label class="btn sm sec" style="cursor:pointer">Import<input type="file" accept=".json" hidden onchange="importData(this)"></label></div>
+    <div class="setting"><span>Start over</span><button class="btn sm danger" onclick="resetAll()">Erase everything</button></div>
+  </div>
+  <p class="muted tiny" style="margin-top:10px;line-height:1.5">On your phone: open this page in Safari or Chrome, then Share → Add to Home Screen. It runs like an app, offline, with your data kept on the device.</p>
+</section>
+
+<button class="fab" id="fab" onclick="openTask()" aria-label="Add task"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+
+<nav><div class="in">
+  <button class="on" data-s="today" onclick="go('today')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Today</button>
+  <button data-s="week" onclick="go('week')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Week</button>
+  <button data-s="tasks" onclick="go('tasks')"><svg viewBox="0 0 24 24"><path d="M4 7h11M4 12h16M4 17h8"/><path d="M18 5l2 2 3-3" opacity=".0"/></svg>Tasks</button>
+  <button data-s="settings" onclick="go('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+</div></nav>
+
+<!-- TASK SHEET -->
+<div class="sheet-bg" id="task-sheet" onclick="if(event.target===this)closeTask()">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="head"><h2 id="ts-title">New task</h2><button class="btn ghost sm" onclick="closeTask()">Cancel</button></div>
+    <div class="field"><label>What needs doing</label><input type="text" id="tf-title" placeholder="e.g. Physics problem set 3" autocomplete="off"></div>
+    <div class="field"><label>Category</label><div class="seg" id="tf-cat"></div></div>
+    <div class="field" id="tf-class-wrap"><label>Class</label><div class="chips" id="tf-class"></div></div>
+    <div class="row" style="gap:12px">
+      <div class="field grow"><label>Due</label><input type="date" id="tf-due"></div>
+      <div class="field grow"><label>Estimated minutes</label><input type="number" id="tf-est" min="5" step="5" placeholder="auto"></div>
+    </div>
+    <div class="field"><label>Priority</label><div class="seg" id="tf-pri">
+      <button data-v="1" onclick="setPri(1)"><span class="dot p1" style="display:inline-block;margin-right:6px"></span>Low</button>
+      <button data-v="2" onclick="setPri(2)"><span class="dot p2" style="display:inline-block;margin-right:6px"></span>Medium</button>
+      <button data-v="3" onclick="setPri(3)"><span class="dot p3" style="display:inline-block;margin-right:6px"></span>High</button>
+    </div></div>
+    <div class="field"><label>Notes / plan</label><textarea id="tf-notes" placeholder="Steps, links, what 'done' looks like…"></textarea></div>
+    <div class="row" style="margin-top:22px;gap:10px">
+      <button class="btn grow" onclick="saveTask()">Save task</button>
+      <button class="btn danger sm" id="tf-del" onclick="deleteTask(editingId)">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+/* ============ STATE ============ */
+const KEY='runway.v1';
+const DEF={
+  settings:{budget:180,dayStart:'09:00',dayEnd:'22:00',chunk:50,breakMin:10,headsUpDays:3,accent:'#0071e3',theme:'auto',appName:'Runway',clientId:'',planCalName:'Runway plan'},
+  categories:[
+    {id:'school',name:'School',hasClasses:true},
+    {id:'projects',name:'Projects',hasClasses:false},
+    {id:'house',name:'House',hasClasses:false}
+  ],
+  classes:[],
+  tasks:[],
+  plan:null,          // {date, budget, blocks:[], skipped:[]}
+  events:{fetchedAt:0,items:[]},
+  planCalId:'',
+  _meta:{updatedAt:0}
+};
+let S=load();
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s){ s.settings={...DEF.settings,...s.settings}; return {...DEF,...s}; } }catch(e){} return structuredClone(DEF); }
+function save(){ S._meta={updatedAt:Date.now()}; localStorage.setItem(KEY,JSON.stringify(S)); queueDriveSync(); }
+const uid=()=>Math.random().toString(36).slice(2,10);
+const $=id=>document.getElementById(id);
+
+/* ============ DATES ============ */
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr=()=>ymd(new Date());
+const parseYmd=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const addDays=(s,n)=>{const d=parseYmd(s);d.setDate(d.getDate()+n);return ymd(d);};
+const daysUntil=s=>Math.round((parseYmd(s)-parseYmd(todayStr()))/86400000);
+const toMin=hhmm=>{const [h,m]=hhmm.split(':').map(Number);return h*60+m;};
+const fromMin=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60,ap=h>=12?'PM':'AM';return `${h%12||12}:${pad(mm)} ${ap}`;};
+const dur=m=>m>=60?`${Math.floor(m/60)}h${m%60?' '+m%60+'m':''}`:`${m}m`;
+const fmtDue=s=>{if(!s)return '';const n=daysUntil(s);if(n<0)return `${-n}d overdue`;if(n===0)return 'Today';if(n===1)return 'Tomorrow';if(n<7)return parseYmd(s).toLocaleDateString(undefined,{weekday:'short'});return parseYmd(s).toLocaleDateString(undefined,{month:'short',day:'numeric'});};
+
+/* ============ ESTIMATES ============ */
+const EST=[[/exam|midterm|final/i,180],[/essay|paper|report|lab report/i,150],[/project|build|design/i,120],[/lab/i,90],[/study|review|prep/i,90],[/homework|problem set|pset|hw/i,75],[/read|chapter/i,60],[/quiz/i,45],[/discussion|post|forum/i,30],[/email|call|schedule|book|order|pay|submit|sign/i,15],[/clean|laundry|dishes|groceries|trash|vacuum/i,40]];
+function autoEst(title){ for(const [re,m] of EST) if(re.test(title)) return m; return 45; }
+
+/* ============ NAV ============ */
+function go(s){ document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id==='s-'+s)); document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===s)); $('fab').style.display=(s==='settings')?'none':'grid'; render(); window.scrollTo(0,0); }
+function toast(t){ const e=$('toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2200); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============ SETTINGS ============ */
+function setS(k,v){ S.settings[k]=v; save(); applyLook(); render(); }
+function applyLook(){ const s=S.settings; document.documentElement.style.setProperty('--accent',s.accent); document.documentElement.dataset.theme=s.theme; document.title=s.appName||'Runway'; }
+function bumpBudget(d){ const b=Math.max(15,Math.min(900,(S.plan&&S.plan.date===todayStr()?S.plan.budget:S.settings.budget)+d)); if(S.plan&&S.plan.date===todayStr()) S.plan.budget=b; else S.settings.budget=b; save(); renderToday(); }
+function curBudget(){ return S.plan&&S.plan.date===todayStr()?S.plan.budget:S.settings.budget; }
+
+/* ============ CATEGORIES & CLASSES ============ */
+let curCat=S.categories[0]?.id;
+function addCategory(){ const n=prompt('Category name'); if(!n)return; const hc=confirm('Does this category have sub-groups (like classes)?'); S.categories.push({id:uid(),name:n,hasClasses:hc}); save(); render(); }
+function renameCategory(id){ const c=S.categories.find(x=>x.id===id); const n=prompt('Rename category',c.name); if(n){c.name=n;save();render();} }
+function removeCategory(id){ const c=S.categories.find(x=>x.id===id); const n=S.tasks.filter(t=>t.catId===id).length; if(!confirm(`Remove "${c.name}"${n?` and its ${n} task(s)`:''}?`))return; S.categories=S.categories.filter(x=>x.id!==id); S.tasks=S.tasks.filter(t=>t.catId!==id); S.classes=S.classes.filter(k=>k.catId!==id); if(curCat===id)curCat=S.categories[0]?.id; save(); render(); }
+function addClass(catId){ const n=prompt('Class name (e.g. PHYS 1211)'); if(!n)return; S.classes.push({id:uid(),name:n,catId}); save(); render(); }
+function removeClass(id){ const k=S.classes.find(x=>x.id===id); const n=S.tasks.filter(t=>t.classId===id).length; if(!confirm(`Remove ${k.name}${n?` and its ${n} task(s)`:''}?`))return; S.classes=S.classes.filter(x=>x.id!==id); S.tasks=S.tasks.filter(t=>t.classId!==id); save(); render(); }
+
+/* ============ TASKS ============ */
+let editingId=null, tfCat=null, tfClass=null, tfPri=2, showDone=false;
+function openTask(id){
+  editingId=id||null; const t=id?S.tasks.find(x=>x.id===id):null;
+  $('ts-title').textContent=t?'Edit task':'New task';
+  $('tf-title').value=t?t.title:''; $('tf-due').value=t?t.due||'':''; $('tf-est').value=t?t.est:''; $('tf-notes').value=t?t.notes||'':'';
+  tfCat=t?t.catId:curCat; tfClass=t?t.classId:(S.classes.find(k=>k.catId===tfCat)?.id||null); setPri(t?t.priority:2);
+  $('tf-del').style.display=t?'':'none';
+  renderTF(); $('task-sheet').classList.add('on'); if(!t) setTimeout(()=>$('tf-title').focus(),100);
+}
+function closeTask(){ $('task-sheet').classList.remove('on'); }
+function setPri(p){ tfPri=p; document.querySelectorAll('#tf-pri button').forEach(b=>b.classList.toggle('on',+b.dataset.v===p)); }
+function renderTF(){
+  $('tf-cat').innerHTML=S.categories.map(c=>`<button class="${c.id===tfCat?'on':''}" onclick="tfCat='${c.id}';tfClass=null;renderTF()">${esc(c.name)}</button>`).join('');
+  const cat=S.categories.find(c=>c.id===tfCat); const ks=S.classes.filter(k=>k.catId===tfCat);
+  $('tf-class-wrap').style.display=cat?.hasClasses?'':'none';
+  if(!tfClass&&ks[0]) tfClass=ks[0].id;
+  $('tf-class').innerHTML=ks.map(k=>`<button class="chip ${k.id===tfClass?'on':''}" onclick="tfClass='${k.id}';renderTF()">${esc(k.name)}</button>`).join('')+`<button class="chip add" onclick="addClass('${tfCat}');renderTF()">+ class</button>`;
+}
+function saveTask(){
+  const title=$('tf-title').value.trim(); if(!title){toast('Give it a name');return;}
+  const est=+$('tf-est').value||autoEst(title);
+  const cat=S.categories.find(c=>c.id===tfCat);
+  const data={title,catId:tfCat,classId:cat?.hasClasses?tfClass:null,due:$('tf-due').value||null,est,priority:tfPri,notes:$('tf-notes').value.trim()};
+  if(editingId){ Object.assign(S.tasks.find(t=>t.id===editingId),data); } else { S.tasks.push({id:uid(),done:false,created:Date.now(),...data}); }
+  save(); closeTask(); render(); toast(editingId?'Saved':'Added'+(!$('tf-est').value?` · est. ${dur(est)}`:''));
+}
+function deleteTask(id){ const t=S.tasks.find(x=>x.id===id); if(!t)return; S.tasks=S.tasks.filter(x=>x.id!==id); if(S.plan) S.plan.blocks=S.plan.blocks.filter(b=>b.taskId!==id); save(); closeTask(); render(); toast('Deleted'); }
+function toggleTask(id){ const t=S.tasks.find(x=>x.id===id); t.done=!t.done; t.doneAt=t.done?Date.now():null; save(); render(); }
+function toggleDone(){ showDone=!showDone; $('show-done').textContent=showDone?'Hide completed':'Show completed'; renderTasks(); }
+const open=()=>S.tasks.filter(t=>!t.done);
+const score=t=>{ let s=t.priority*10; if(t.due){const n=daysUntil(t.due); s+= n<0?30:n===0?20:Math.max(0,14-n)*1.5;} return s; };
+
+/* ============ SCHEDULER ============ */
+function busyFor(date){ return S.events.items.filter(e=>!e.allDay&&e.date===date).map(e=>[toMin(e.start),toMin(e.end),e.title]).sort((a,b)=>a[0]-b[0]); }
+function freeSlots(date,budgetOnly){
+  const s=S.settings; let start=toMin(s.dayStart), end=toMin(s.dayEnd); if(end<=start) end=start+600;
+  if(date===todayStr()){ const n=new Date(); start=Math.max(start,Math.ceil((n.getHours()*60+n.getMinutes())/5)*5); }
+  let slots=[[start,end]];
+  for(const [bs,be] of busyFor(date)){ const out=[]; for(const [a,b] of slots){ if(be<=a||bs>=b){out.push([a,b]);continue;} if(bs>a)out.push([a,bs]); if(be<b)out.push([be,b]); } slots=out; }
+  return slots.filter(([a,b])=>b-a>=15);
+}
+function buildPlan(date,budget){
+  const s=S.settings, slots=freeSlots(date).map(([a,b])=>({a,b,cur:a}));
+  const tasks=open().sort((x,y)=>score(y)-score(x)||x.created-y.created);
+  const blocks=[], skipped=[]; let left=budget;
+  const freeTotal=slots.reduce((n,x)=>n+(x.b-x.a),0);
+  for(const t of tasks){
+    if(t.est>left){ skipped.push({taskId:t.id,why:'over budget'}); continue; }
+    // try to place, chunked
+    const trial=[]; let need=t.est, ok=true;
+    const snap=slots.map(x=>x.cur);
+    while(need>0){
+      const sl=slots.find(x=>x.b-x.cur>=Math.min(need,15)); if(!sl){ok=false;break;}
+      const piece=Math.min(need,s.chunk,sl.b-sl.cur);
+      trial.push({taskId:t.id,title:t.title,start:sl.cur,end:sl.cur+piece});
+      sl.cur+=piece; need-=piece;
+      if(need>0||true) sl.cur+=s.breakMin; // breathing room after every block
+    }
+    if(!ok){ slots.forEach((x,i)=>x.cur=snap[i]); skipped.push({taskId:t.id,why:'no free time'}); continue; }
+    blocks.push(...trial); left-=t.est;
+  }
+  return {date,budget,blocks:blocks.sort((a,b)=>a.start-b.start),skipped,freeTotal};
+}
+function planToday(){ const b=curBudget(); S.plan=buildPlan(todayStr(),b); save(); renderToday(); toast(S.plan.blocks.length?`${new Set(S.plan.blocks.map(x=>x.taskId)).size} tasks planned`:'Nothing fits — add time or clear the calendar'); }
+function clearPlan(){ S.plan=null; save(); renderToday(); }
+// projection across future days at default budget (ignores calendar beyond fetched events)
+function projection(){
+  const tasks=open().sort((x,y)=>score(y)-score(x)||x.created-y.created);
+  const res=[]; let day=todayStr(), left=curBudget(); const planned=new Set((S.plan&&S.plan.date===todayStr()?S.plan.blocks:[]).map(b=>b.taskId));
+  // if today is planned, honor it
+  if(planned.size){ for(const t of tasks) if(planned.has(t.id)) res.push({t,day}); left=0; }
+  let i=0;
+  for(const t of tasks){ if(planned.has(t.id))continue;
+    while(t.est>left){ day=addDays(day,1); left=S.settings.budget; if(++i>60)break; }
+    if(i>60){res.push({t,day:null});continue;}
+    left-=t.est; res.push({t,day});
+  }
+  return res;
+}
+
+/* ============ RENDER ============ */
+function render(){ renderToday(); renderWeek(); renderTasks(); renderSettings(); }
+function taskRow(t,opts={}){
+  const c=S.categories.find(x=>x.id===t.catId), k=S.classes.find(x=>x.id===t.classId);
+  const due=t.due?`<span class="${daysUntil(t.due)<0?'overdue':''}">${fmtDue(t.due)}</span>`:'';
+  return `<div class="item ${t.done?'done':''} p${t.priority}">
+    <button class="chk ${t.done?'on':''}" onclick="toggleTask('${t.id}')" aria-label="Done"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></button>
+    <div class="grow" onclick="openTask('${t.id}')"><div class="t">${esc(t.title)}</div><div class="m"><span class="dot"></span>${due}<span>${dur(t.est)}</span>${opts.showCat?`<span>${esc(k?k.name:c?c.name:'')}</span>`:''}${t.notes?'<span>· notes</span>':''}</div></div>
+    <button class="x" onclick="deleteTask('${t.id}')" aria-label="Delete"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`;
+}
+function renderToday(){
+  const d=new Date(), h=d.getHours();
+  $('today-greet').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+' · '+d.toLocaleDateString(undefined,{weekday:'long'});
+  $('today-date').textContent=d.toLocaleDateString(undefined,{month:'long',day:'numeric'});
+  // heads up
+  const hu=open().filter(t=>t.due&&t.priority===3&&daysUntil(t.due)<=S.settings.headsUpDays).sort((a,b)=>a.due.localeCompare(b.due));
+  const od=open().filter(t=>t.due&&daysUntil(t.due)<0&&t.priority<3);
+  $('headsup').innerHTML=(hu.length||od.length)?`<h2>Heads up</h2><div class="list">${[...hu,...od].map(t=>`<div class="item p${t.priority}" onclick="openTask('${t.id}')"><span class="dot"></span><div class="grow"><div class="t">${esc(t.title)}</div><div class="m"><span class="${daysUntil(t.due)<0?'overdue':''}">${daysUntil(t.due)<0?fmtDue(t.due):'Due '+fmtDue(t.due).toLowerCase()}</span><span>${dur(t.est)}</span></div></div></div>`).join('')}</div>`:'';
+  // reality
+  const budget=curBudget(); const need=open().reduce((n,t)=>n+t.est,0);
+  $('budget-txt').textContent=dur(budget);
+  const mx=Math.max(need,budget,1); $('cap-have').style.width=(budget/mx*100)+'%'; $('cap-need').style.width=(need/mx*100)+'%';
+  const days=Math.ceil(need/Math.max(budget,1));
+  $('verdict').textContent=!need?'Nothing open. Add a task or enjoy the quiet.':need<=budget?`Everything open (${dur(need)}) fits in today's budget.`:`Everything open needs ${dur(need)} — about ${days} day${days>1?'s':''} at this pace. Today gets the ${dur(budget)} that matters most.`;
+  $('push-btn').style.display=S.settings.clientId?'':'none';
+  // plan
+  const p=S.plan; const w=$('plan-wrap');
+  if(!p||p.date!==todayStr()){
+    const ev=busyFor(todayStr());
+    w.innerHTML=`<h2>Today's calendar</h2>`+(ev.length?`<div class="tl">${ev.map(([a,b,t])=>`<div class="blk ev"><span class="tm">${fromMin(a)}</span>${esc(t)}<div class="tiny">until ${fromMin(b)}</div></div>`).join('')}</div>`:`<div class="empty">${S.settings.clientId?'No events today. ':'Connect Google Calendar in Settings and your events show up here. '}Tap <b>Plan my day</b> to schedule tasks.</div>`);
+    return;
+  }
+  const items=[...p.blocks.map(b=>({...b,kind:'task'})),...busyFor(todayStr()).map(([a,b,t])=>({start:a,end:b,title:t,kind:'ev'}))].sort((a,b)=>a.start-b.start);
+  const nowMin=new Date().getHours()*60+new Date().getMinutes();
+  const total=new Set(p.blocks.map(b=>b.taskId)).size, done=new Set(p.blocks.filter(b=>S.tasks.find(t=>t.id===b.taskId)?.done).map(b=>b.taskId)).size;
+  w.innerHTML=`<h2>Your day <small>${done}/${total} done</small></h2>
+  ${items.length?`<div class="tl">${items.map(b=>{ if(b.kind==='ev') return `<div class="blk ev"><span class="tm">${fromMin(b.start)}</span>${esc(b.title)}<div class="tiny">until ${fromMin(b.end)}</div></div>`;
+    const t=S.tasks.find(x=>x.id===b.taskId); if(!t) return ''; const now=nowMin>=b.start&&nowMin<b.end;
+    return `<div class="blk task ${now?'now':''} p${t.priority}"><span class="tm">${fromMin(b.start)}</span><div class="row"><button class="chk ${t.done?'on':''}" onclick="toggleTask('${t.id}')"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></button><div class="grow" onclick="openTask('${t.id}')"><div style="font-weight:500;${t.done?'text-decoration:line-through;opacity:.5':''}">${esc(t.title)}</div><div class="tiny muted"><span class="dot" style="display:inline-block;vertical-align:middle;margin-right:5px"></span>${dur(b.end-b.start)} · until ${fromMin(b.end)}</div>${t.notes?`<div class="note">${esc(t.notes)}</div>`:''}</div></div></div>`; }).join('')}</div>`:`<div class="empty">No room today. Free up time or lower the estimates.</div>`}
+  ${p.skipped.length?`<h2>Not today <small>on purpose</small></h2><div class="list">${p.skipped.map(s=>{const t=S.tasks.find(x=>x.id===s.taskId); if(!t)return ''; const pr=projection().find(r=>r.t.id===t.id); return `<div class="item p${t.priority}" onclick="openTask('${t.id}')"><span class="dot"></span><div class="grow"><div class="t">${esc(t.title)}</div><div class="m"><span>${s.why}</span><span>${dur(t.est)}</span>${t.due?`<span class="${daysUntil(t.due)<0?'overdue':''}">due ${fmtDue(t.due).toLowerCase()}</span>`:''}${pr&&pr.day?`<span>→ ${fmtDue(pr.day)}</span>`:''}</div></div></div>`}).join('')}</div>`:''}
+  <div class="row" style="margin-top:14px"><button class="btn ghost sm" onclick="clearPlan()">Clear plan</button><span class="muted tiny">Plan again after adding tasks or syncing.</span></div>`;
+}
+function renderWeek(){
+  const od=open().filter(t=>t.due&&daysUntil(t.due)<0).sort((a,b)=>a.due.localeCompare(b.due));
+  $('overdue-wrap').innerHTML=od.length?`<h2 class="overdue">Overdue</h2><div class="list">${od.map(t=>taskRow(t,{showCat:true})).join('')}</div>`:'';
+  let html='';
+  for(let i=0;i<7;i++){ const d=addDays(todayStr(),i), dt=parseYmd(d);
+    const ev=S.events.items.filter(e=>e.date===d); const tk=S.tasks.filter(t=>t.due===d&&(!t.done||t.doneAt>Date.now()-86400000*2)).sort((a,b)=>b.priority-a.priority);
+    html+=`<div class="day ${i===0?'today':''}"><h3>${i===0?'Today':i===1?'Tomorrow':dt.toLocaleDateString(undefined,{weekday:'long'})}<span>${dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></h3>
+      ${ev.map(e=>`<div class="ev">${e.allDay?'All day':fromMin(toMin(e.start))} · ${esc(e.title)}</div>`).join('')}
+      ${tk.map(t=>`<div class="tk ${t.done?'done':''}" onclick="openTask('${t.id}')"><span class="dot p${t.priority}"></span><span>${esc(t.title)}</span></div>`).join('')}
+      ${!ev.length&&!tk.length?'<div class="muted tiny" style="margin-top:12px">Clear</div>':''}</div>`;
+  }
+  $('week').innerHTML=html;
+  const pr=projection(); const late=pr.filter(r=>r.t.due&&(!r.day||r.day>r.t.due));
+  $('projection').innerHTML=!pr.length?'<div class="muted">No open tasks.</div>':
+    `<div class="small" style="margin-bottom:10px">${late.length?`<span class="overdue" style="font-weight:600">${late.length} task${late.length>1?'s':''} won't make the deadline</span> at ${dur(S.settings.budget)}/day. Raise the budget, shrink estimates, or drop something.`:`Everything lands before its due date at ${dur(S.settings.budget)}/day.`}</div>
+    ${pr.slice(0,25).map(r=>`<div class="row small" style="padding:7px 0;border-top:1px solid var(--line)"><span class="dot p${r.t.priority}"></span><span class="grow" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.t.title)}</span><span class="muted" style="flex:none">${r.day?fmtDue(r.day):'—'}${r.t.due&&(!r.day||r.day>r.t.due)?' <span class="overdue">late</span>':''}</span></div>`).join('')}${pr.length>25?`<div class="muted tiny" style="margin-top:8px">+${pr.length-25} more</div>`:''}`;
+}
+function renderTasks(){
+  if(!S.categories.find(c=>c.id===curCat)) curCat=S.categories[0]?.id;
+  $('task-count').textContent=`${open().length} open`;
+  $('cat-seg').innerHTML=S.categories.map(c=>`<button class="${c.id===curCat?'on':''}" onclick="curCat='${c.id}';renderTasks()">${esc(c.name)}</button>`).join('');
+  const cat=S.categories.find(c=>c.id===curCat); if(!cat){$('classes-wrap').innerHTML='';$('task-lists').innerHTML='<div class="empty">Add a category in Settings.</div>';return;}
+  const list=S.tasks.filter(t=>t.catId===curCat&&(showDone||!t.done)).sort((a,b)=>a.done-b.done||(a.due||'9').localeCompare(b.due||'9')||b.priority-a.priority);
+  if(cat.hasClasses){
+    const ks=S.classes.filter(k=>k.catId===curCat);
+    $('classes-wrap').innerHTML=`<div class="chips">${ks.map(k=>`<span class="chip">${esc(k.name)}<button class="x" style="padding:0;margin:-2px -4px -2px 0" onclick="removeClass('${k.id}')" aria-label="Remove class">×</button></span>`).join('')}<button class="chip add" onclick="addClass('${curCat}')">+ class</button></div>`;
+    $('task-lists').innerHTML=ks.length?ks.map(k=>{const tk=list.filter(t=>t.classId===k.id); return `<h2>${esc(k.name)}<small>${tk.filter(t=>!t.done).length} open</small></h2><div class="list">${tk.length?tk.map(t=>taskRow(t)).join(''):'<div class="empty">Nothing due. Tap + to add an assignment.</div>'}</div>`;}).join('')+(list.filter(t=>!t.classId||!ks.find(k=>k.id===t.classId)).length?`<h2>Unassigned</h2><div class="list">${list.filter(t=>!t.classId||!ks.find(k=>k.id===t.classId)).map(t=>taskRow(t)).join('')}</div>`:''):`<div class="empty">Add your first class above, then tap + for assignments.</div>`;
+  } else {
+    $('classes-wrap').innerHTML='';
+    $('task-lists').innerHTML=`<div class="list" style="margin-top:16px">${list.length?list.map(t=>taskRow(t)).join(''):'<div class="empty">Empty. Tap + to add something.</div>'}</div>`;
+  }
+}
+function renderSettings(){
+  const s=S.settings;
+  $('st-budget').value=s.budget; $('st-start').value=s.dayStart; $('st-end').value=s.dayEnd; $('st-chunk').value=s.chunk; $('st-break').value=s.breakMin; $('st-heads').value=s.headsUpDays;
+  $('st-name').value=s.appName; $('st-accent').value=s.accent; $('st-theme').value=s.theme; $('st-client').value=s.clientId; $('st-plancal').value=s.planCalName;
+  $('cat-list').innerHTML=S.categories.map(c=>`<div class="setting"><div><div>${esc(c.name)}</div><div class="status">${c.hasClasses?'with classes · ':''}${S.tasks.filter(t=>t.catId===c.id&&!t.done).length} open</div></div><div class="row" style="gap:4px"><button class="btn ghost sm" onclick="renameCategory('${c.id}')">Rename</button><button class="btn danger sm" onclick="removeCategory('${c.id}')">Remove</button></div></div>`).join('');
+  $('data-size').textContent=`${S.tasks.length} tasks · ${(localStorage.getItem(KEY)||'').length/1024|0} KB`;
+  const ok=gToken(); $('g-status').textContent=ok?`Connected · ${S.events.items.length} events synced`:'Not connected'; $('g-status').className='status '+(ok?'ok':''); $('g-btn').textContent=ok?'Disconnect':'Connect';
+  setSyncStatus(ok?'synced':'—');
+  $('st-sp-client').value=spClientId();
+  const sok=spToken(); $('sp-status').textContent=sok?'Connected':'Not connected'; $('sp-status').className='status '+(sok?'ok':''); $('sp-btn').textContent=sok?'Disconnect':'Connect';
+  $('sync-btn').style.display=s.clientId?'':'none';
+}
+
+/* ============ DATA ============ */
+function exportData(){ const a=document.createElement('a'); a.href='data:application/json,'+encodeURIComponent(JSON.stringify(S,null,1)); a.download=`runway-backup-${todayStr()}.json`; a.click(); }
+function importData(inp){ const f=inp.files[0]; if(!f)return; f.text().then(t=>{ try{ const s=JSON.parse(t); if(!s.tasks)throw 0; S={...DEF,...s}; S.settings={...DEF.settings,...s.settings}; save(); applyLook(); render(); toast('Restored'); }catch(e){ toast('That file isn’t a Runway backup'); } }); }
+function resetAll(){ if(confirm('Erase all tasks, classes and settings on this device?')){ localStorage.removeItem(KEY); S=structuredClone(DEF); applyLook(); render(); } }
+
+/* ============ SPOTIFY (now playing) ============ */
+const SP_KEY='runway.spotify'; // kept out of S / Drive sync on purpose — it's a separate credential
+function spData(){ try{ return JSON.parse(localStorage.getItem(SP_KEY))||{}; }catch(e){ return {}; } }
+function spSave(d){ localStorage.setItem(SP_KEY, JSON.stringify(d)); }
+function spClientId(){ return spData().clientId||''; }
+function setSpotifyClientId(v){ spSave({...spData(),clientId:v}); }
+function spToken(){ const d=spData(); if(d.access&&d.exp>Date.now()) return d.access; return null; }
+function spRedirectUri(){ return location.origin+location.pathname; }
+function b64url(bytes){ return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function randStr(len){ const a=new Uint8Array(len); crypto.getRandomValues(a); return Array.from(a,d=>('0'+d.toString(16)).slice(-2)).join('').slice(0,len); }
+async function spChallenge(verifier){ const h=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)); return b64url(h); }
+async function spConnect(){
+  if(spToken()||spData().refresh){ spSave({clientId:spClientId()}); toast('Disconnected'); render(); return; }
+  const cid=spClientId(); if(!cid){ toast('Paste your Spotify client ID first'); return; }
+  const verifier=randStr(64); sessionStorage.setItem('runway.spverifier',verifier);
+  const challenge=await spChallenge(verifier);
+  const p=new URLSearchParams({response_type:'code',client_id:cid,scope:'user-read-currently-playing user-read-playback-state user-modify-playback-state',redirect_uri:spRedirectUri(),code_challenge_method:'S256',code_challenge:challenge,state:'runway'});
+  location.href='https://accounts.spotify.com/authorize?'+p.toString();
+}
+async function spExchange(code){
+  const cid=spClientId(); const verifier=sessionStorage.getItem('runway.spverifier');
+  const r=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:spRedirectUri(),client_id:cid,code_verifier:verifier})});
+  const j=await r.json(); if(!r.ok){ toast('Spotify connect failed'); return; }
+  spSave({clientId:cid,access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in-60)*1000});
+  toast('Connected'); spPoll();
+}
+async function spRefresh(){
+  const d=spData(); if(!d.refresh) return null;
+  try{ const r=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',refresh_token:d.refresh,client_id:d.clientId})});
+    const j=await r.json(); if(!r.ok) throw 0;
+    spSave({...d,access:j.access_token,exp:Date.now()+(j.expires_in-60)*1000,refresh:j.refresh_token||d.refresh}); return j.access_token;
+  }catch(e){ return null; }
+}
+async function spFetch(path,opt={}){
+  let tok=spToken(); if(!tok) tok=await spRefresh(); if(!tok) throw new Error('not connected');
+  const r=await fetch('https://api.spotify.com/v1'+path,{...opt,headers:{Authorization:'Bearer '+tok,...(opt.headers||{})}});
+  if(r.status===401){ const t2=await spRefresh(); if(!t2) throw new Error('auth'); return spFetch(path,opt); }
+  return r;
+}
+let spNow=null, spTimer=null;
+async function spPoll(){
+  if(!spData().refresh&&!spToken()) return;
+  try{ const r=await spFetch('/me/player/currently-playing');
+    if(r.status===204){ spNow=null; } else { const j=await r.json(); spNow=j&&j.item?j:null; }
+  }catch(e){ spNow=null; }
+  renderNowPlaying();
+}
+function spCtl(action){ spFetch('/me/player/'+action,{method:action==='next'||action==='previous'?'POST':'PUT'}).then(()=>setTimeout(spPoll,500)).catch(()=>toast('Open Spotify on a device first')); }
+function renderNowPlaying(){
+  const el=$('now-playing'); if(!el) return;
+  if(!spNow||!spNow.item){ el.innerHTML=''; return; }
+  const t=spNow.item, art=(t.album&&t.album.images&&t.album.images[t.album.images.length>1?1:0])?.url;
+  const pct=Math.min(100,(spNow.progress_ms/t.duration_ms)*100);
+  el.innerHTML=`<div class="now-playing">
+    ${art?`<img src="${art}" alt="">`:''}
+    <div class="grow" style="min-width:0">
+      <div class="np-t">${esc(t.name)}</div>
+      <div class="np-a">${esc(t.artists.map(a=>a.name).join(', '))}</div>
+      <div class="np-bar"><i style="width:${pct}%"></i></div>
+    </div>
+    <button onclick="spCtl('previous')" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 10-6v12z"/></svg></button>
+    <button onclick="spCtl('${spNow.is_playing?'pause':'play'}')" aria-label="Play or pause">${spNow.is_playing?'<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>':'<svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg>'}</button>
+    <button onclick="spCtl('next')" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM4.5 6l10 6-10 6z"/></svg></button>
+  </div>`;
+}
+(function spBoot(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('code')&&params.get('state')==='runway'){ spExchange(params.get('code')); history.replaceState({},'',location.pathname); }
+  else if(spData().refresh){ spPoll(); }
+  clearInterval(spTimer); spTimer=setInterval(spPoll,15000);
+})();
+
+/* ============ GOOGLE CALENDAR ============ */
+const SCOPE='https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.appdata';
+function gToken(){ try{ const t=JSON.parse(sessionStorage.getItem('runway.tok')); if(t&&t.exp>Date.now()) return t.v; }catch(e){} return null; }
+function loadGis(){ return new Promise((res,rej)=>{ if(window.google?.accounts) return res(); const sc=document.createElement('script'); sc.src='https://accounts.google.com/gsi/client'; sc.onload=res; sc.onerror=()=>rej(new Error('Could not load Google sign-in')); document.head.appendChild(sc); }); }
+async function gConnect(){
+  if(gToken()){ sessionStorage.removeItem('runway.tok'); S.events={fetchedAt:0,items:[]}; driveFileId=null; localStorage.setItem(KEY,JSON.stringify(S)); render(); toast('Disconnected'); return; }
+  if(!S.settings.clientId){ toast('Paste your OAuth client ID first'); return; }
+  try{ await loadGis(); }catch(e){ toast(e.message); return; }
+  google.accounts.oauth2.initTokenClient({client_id:S.settings.clientId,scope:SCOPE,callback:async r=>{ if(r.error){toast('Google said no: '+r.error);return;} sessionStorage.setItem('runway.tok',JSON.stringify({v:r.access_token,exp:Date.now()+(r.expires_in-60)*1000})); toast('Connected'); syncCalendar(); await syncDrive(); render(); }}).requestAccessToken();
+}
+
+/* ============ DRIVE SYNC ============ */
+let driveFileId=null, driveTimer=null, driveBusy=false;
+function setSyncStatus(s){ const el=$('drive-status'); if(!el)return; el.textContent=s==='synced'?'Up to date':s==='syncing'?'Syncing…':s==='error'?'Couldn’t sync':'—'; el.className='status '+(s==='synced'?'ok':s==='error'?'overdue':''); }
+function gFetchDrive(path,opt={}){ const tok=gToken(); if(!tok) return Promise.reject(new Error('Not connected')); return fetch('https://www.googleapis.com/drive/v3/'+path,{...opt,headers:{Authorization:'Bearer '+tok,...(opt.headers||{})}}).then(async r=>{ if(r.status===204) return {}; const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error?.message||r.statusText); return j; }); }
+async function driveFind(){ const r=await gFetchDrive(`files?spaces=appDataFolder&fields=files(id,modifiedTime)&q=${encodeURIComponent("name='runway.json'")}`); return (r.files&&r.files[0])||null; }
+function queueDriveSync(){ if(!gToken())return; clearTimeout(driveTimer); driveTimer=setTimeout(pushToDrive,1500); }
+async function pushToDrive(){
+  if(!gToken()||driveBusy) return; driveBusy=true; setSyncStatus('syncing');
+  try{
+    const body=JSON.stringify(S);
+    if(!driveFileId){ const f=await driveFind(); driveFileId=f?f.id:null; }
+    if(driveFileId){
+      const r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+gToken(),'Content-Type':'application/json'},body});
+      if(!r.ok) throw new Error('save failed');
+    } else {
+      const meta={name:'runway.json',parents:['appDataFolder']};
+      const b='runwayb'+Math.random().toString(36).slice(2);
+      const mp=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
+      const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+gToken(),'Content-Type':`multipart/related; boundary=${b}`},body:mp});
+      const j=await r.json(); if(!r.ok) throw new Error(j.error?.message||'create failed'); driveFileId=j.id;
+    }
+    setSyncStatus('synced');
+  }catch(e){ setSyncStatus('error'); }
+  driveBusy=false;
+}
+async function pullFromDrive(silent){
+  if(!gToken()) return; setSyncStatus('syncing');
+  try{
+    const f=await driveFind(); if(!f){ driveFileId=null; setSyncStatus('synced'); return; }
+    driveFileId=f.id;
+    const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+gToken()}});
+    if(!r.ok) throw new Error('read failed');
+    const remote=await r.json();
+    const remoteT=remote._meta?.updatedAt||0, localT=S._meta?.updatedAt||0;
+    if(remoteT>localT){
+      remote.settings={...DEF.settings,...remote.settings};
+      S={...DEF,...remote};
+      localStorage.setItem(KEY,JSON.stringify(S));
+      applyLook(); render();
+      if(!silent) toast('Synced from your other device');
+    }
+    setSyncStatus('synced');
+  }catch(e){ setSyncStatus('error'); }
+}
+async function syncDrive(silent){ if(!gToken())return; await pullFromDrive(silent); await pushToDrive(); }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&gToken()) syncDrive(true); });
+async function gFetch(path,opt={}){
+  const tok=gToken(); if(!tok) throw new Error('Not connected');
+  const r=await fetch('https://www.googleapis.com/calendar/v3/'+path,{...opt,headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json',...(opt.headers||{})}});
+  if(r.status===204) return {}; const j=await r.json(); if(!r.ok) throw new Error(j.error?.message||r.statusText); return j;
+}
+async function syncCalendar(){
+  if(!gToken()){ if(S.settings.clientId) gConnect(); else toast('Set up Google Calendar in Settings'); return; }
+  try{
+    toast('Syncing…');
+    const cals=(await gFetch('users/me/calendarList')).items||[];
+    const planCal=cals.find(c=>c.summary===S.settings.planCalName); S.planCalId=planCal?planCal.id:'';
+    const tmin=parseYmd(todayStr()).toISOString(), tmax=parseYmd(addDays(todayStr(),8)).toISOString();
+    const items=[];
+    for(const c of cals){ if(c.id===S.planCalId||c.selected===false) continue;
+      const r=await gFetch(`calendars/${encodeURIComponent(c.id)}/events?singleEvents=true&orderBy=startTime&timeMin=${tmin}&timeMax=${tmax}&maxResults=250`);
+      for(const e of r.items||[]){ if(e.status==='cancelled'||e.transparency==='transparent') continue;
+        if(e.start.date){ let d=e.start.date; while(d<e.end.date){ items.push({id:e.id,title:e.summary||'(busy)',allDay:true,date:d}); d=addDays(d,1);} }
+        else { const a=new Date(e.start.dateTime), b=new Date(e.end.dateTime); items.push({id:e.id,title:e.summary||'(busy)',allDay:false,date:ymd(a),start:`${pad(a.getHours())}:${pad(a.getMinutes())}`,end:ymd(b)===ymd(a)?`${pad(b.getHours())}:${pad(b.getMinutes())}`:'23:59'}); }
+      }
+    }
+    S.events={fetchedAt:Date.now(),items}; save(); render(); toast(`${items.length} events synced`);
+  }catch(e){ toast(e.message); if(/401|credential/i.test(e.message)) sessionStorage.removeItem('runway.tok'); }
+}
+async function ensurePlanCal(){ if(S.planCalId) return S.planCalId; const cals=(await gFetch('users/me/calendarList')).items||[]; let c=cals.find(x=>x.summary===S.settings.planCalName); if(!c) c=await gFetch('calendars',{method:'POST',body:JSON.stringify({summary:S.settings.planCalName,description:'Generated daily plans from Runway'})}); S.planCalId=c.id; save(); return c.id; }
+async function pushPlan(){
+  const p=S.plan; if(!p||p.date!==todayStr()||!p.blocks.length){ toast('Plan your day first'); return; }
+  if(!gToken()){ gConnect(); return; }
+  try{
+    toast('Sending…'); const cal=await ensurePlanCal(); const base=parseYmd(p.date);
+    const old=await gFetch(`calendars/${encodeURIComponent(cal)}/events?privateExtendedProperty=app%3Drunway&timeMin=${base.toISOString()}&timeMax=${parseYmd(addDays(p.date,1)).toISOString()}&singleEvents=true`);
+    for(const e of old.items||[]) await gFetch(`calendars/${encodeURIComponent(cal)}/events/${e.id}`,{method:'DELETE'});
+    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const iso=m=>{const d=new Date(base);d.setMinutes(m);return d.toISOString();};
+    for(const b of p.blocks){ const t=S.tasks.find(x=>x.id===b.taskId); if(!t||t.done) continue;
+      await gFetch(`calendars/${encodeURIComponent(cal)}/events`,{method:'POST',body:JSON.stringify({summary:t.title,description:t.notes||'',start:{dateTime:iso(b.start),timeZone:tz},end:{dateTime:iso(b.end),timeZone:tz},extendedProperties:{private:{app:'runway'}}})}); }
+    toast(`Added to "${S.settings.planCalName}"`);
+  }catch(e){ toast(e.message); }
+}
+
+/* ============ BOOT ============ */
+applyLook(); render();
+if(gToken()){ if(Date.now()-S.events.fetchedAt>30*60*1000) syncCalendar(); syncDrive(true).then(render); }
+setInterval(renderToday,60000);
+window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeTask(); if(e.key==='Enter'&&$('task-sheet').classList.contains('on')&&e.target.id==='tf-title') saveTask(); });
+</script>
+</body>
+</html>
